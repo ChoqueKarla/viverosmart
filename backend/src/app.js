@@ -37,6 +37,7 @@ const allowedOrigins = new Set([
 
 const corsOptions = {
   origin(origin, callback) {
+ 	console.log('CORS Origin recibido:', origin);
     // Permitir peticiones sin Origin (curl, Postman, health checks, etc.)
     if (!origin) {
       return callback(null, true);
