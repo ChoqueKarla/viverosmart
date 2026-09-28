@@ -119,7 +119,7 @@ model Sector {
   crops        Crop[]
   plants       Plant[]
   schedules    Schedule[]
-  user         User?                @relation("SectorClient", fields: [userId], references: [id])
+  user         User?                @relation("SectorClient", fields: [userId], references: [id], onDelete: SetNull)
   sensors      Sensor[]
   thresholds   Threshold[]
 }
@@ -169,7 +169,7 @@ model ConsumptionAnomaly {
   resolvedAt    DateTime?
   consumptionId Int?
   sectorId      Int
-  consumption   Consumption? @relation(fields: [consumptionId], references: [id])
+  consumption   Consumption? @relation(fields: [consumptionId], references: [id], onDelete: SetNull)
   sector        Sector       @relation(fields: [sectorId], references: [id], onDelete: Cascade)
 }
 

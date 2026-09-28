@@ -1,2 +1,0 @@
-"executionRoleArn": "arn:aws:iam::310649435045:role/ecsTaskExecutionRole",
-"taskRoleArn": "arn:aws:iam::310649435045:role/ecsExecTaskRole",

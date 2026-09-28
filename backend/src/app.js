@@ -33,26 +33,26 @@ const app = express();
 // CORS
 // ======================================================
 
+const configuredOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
 const allowedOrigins = new Set([
-  process.env.FRONTEND_URL || 'http://localhost:5173',
+  process.env.FRONTEND_URL,
   'http://localhost:5173',
-  'http://viverosmart-frontend-alb-1642573275.us-east-1.elb.amazonaws.com',
-  'https://main.d2gry3pkizcub6.amplifyapp.com',
-]);
+  'http://127.0.0.1:5173',
+  'http://localhost:8080',
+  ...configuredOrigins,
+].filter(Boolean));
 
 const corsOptions = {
   origin(origin, callback) {
-    console.log('CORS Origin recibido:', origin);
-
     if (!origin) {
       return callback(null, true);
     }
 
     if (allowedOrigins.has(origin)) {
-      return callback(null, true);
-    }
-
-    if (/^http:\/\/\d{1,3}(\.\d{1,3}){3}$/.test(origin)) {
       return callback(null, true);
     }
 
@@ -78,20 +78,6 @@ const limiter = rateLimit({
   message: {
     error:
       'Demasiadas peticiones desde esta IP. Inténtalo de nuevo en 15 minutos.',
-  },
-});
-
-// Límite de autenticación.
-// Se deja definido para poder utilizarlo en operaciones
-// sensibles posteriormente, pero NO se aplica a todo
-// /api/auth porque setup-status se consulta automáticamente.
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-
-  message: {
-    error:
-      'Demasiados intentos fallidos. Bloqueado temporalmente por seguridad.',
   },
 });
 
