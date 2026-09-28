@@ -58,6 +58,17 @@ app.use('/api/plantas', authMiddleware, plantRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/smart', apiRoutes);
 
+// Kubernetes y los balanceadores usan esta ruta para comprobar que la API y
+// su conexión con PostgreSQL están disponibles antes de enviarle tráfico.
+app.get('/health', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return res.status(200).json({ status: 'ok' });
+  } catch (error) {
+    return res.status(503).json({ status: 'unavailable' });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Backend de Vivero Inteligente corriendo en puerto ${PORT}`);

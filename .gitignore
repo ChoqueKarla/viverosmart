@@ -10,6 +10,11 @@ yarn-error.log*
 .env.development
 .env.test
 .env.production
+.env.docker
+
+# Secretos reales de Kubernetes: conservar solo k8s/secret.example.yaml
+/k8s/secret*.yaml
+!/k8s/secret.example.yaml
 
 # Archivos de construcción (Build) del frontend
 /frontend/dist/
