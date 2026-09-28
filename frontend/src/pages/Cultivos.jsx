@@ -38,14 +38,23 @@ export default function Cultivos() {
         axios.get(`${API_URL}/smart/sectores`, {
           headers: headers(),
         }),
-        axios.get(`${API_URL}/usuarios`, {
-          headers: headers(),
+        axios.get(`${API_URL}/smart/usuarios`, {
+        headers: headers(),
         }).catch(() => ({ data: [] })),
       ]);
 
       setCrops(c.data);
       setSectors(s.data);
       setUsers(u.data);
+      setUsers(
+        u.data.filter(
+          (user) =>
+            user.role === 'Cliente' ||
+            user.role?.name === 'Cliente' ||
+            user.rol === 'Cliente' ||
+            user.rol?.name === 'Cliente'
+        )
+      );
     } catch (error) {
       console.error('Error cargando datos:', error);
     }
