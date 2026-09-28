@@ -247,8 +247,11 @@ router.post('/', async (req, res) => {
         !Number.isFinite(lng) || lng < -180 || lng > 180) {
       return res.status(400).json({ error: 'Indica un nombre, una especie y coordenadas válidas.' });
     }
+    const user = await prisma.user.findUnique({ where: { id: req.user.id }, include: { role: true } });
+    const targetUserId = (user.role.name === 'Administrador' && req.body.userId) ? Number(req.body.userId) : req.user.id;
+
     const plant = await prisma.plant.create({
-      data: { name: name.trim(), species: species.trim(), lat, lng, sectorId: selectedSectorId, userId: req.user.id }
+      data: { name: name.trim(), species: species.trim(), lat, lng, sectorId: selectedSectorId, userId: targetUserId }
     });
     res.json(plant);
   } catch (error) {

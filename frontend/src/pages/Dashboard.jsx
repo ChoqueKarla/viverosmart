@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   BarChart,
@@ -169,7 +169,7 @@ export default function Dashboard() {
         }).format(amount);
 
   return (
-    <div className="min-h-full bg-[#f7f8f6] p-6 lg:p-8">
+    <div className="dashboard-page min-h-full bg-[#f7f8f6] p-6 lg:p-8">
 
       {/* HEADER */}
       <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] lg:p-7">
@@ -226,7 +226,7 @@ export default function Dashboard() {
       <div className="mb-6 grid gap-4 md:grid-cols-3">
 
         {/* AGUA */}
-        <article className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_35px_rgba(15,23,42,0.07)]">
+        <article className="metric-water group rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_35px_rgba(15,23,42,0.07)]">
 
           <div className="flex items-start justify-between">
 
@@ -248,9 +248,9 @@ export default function Dashboard() {
 
           <div className="mt-6 flex items-end gap-2">
 
-            <span className="text-3xl font-bold tracking-tight text-slate-900">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               {value(water)}
-            </span>
+            </h2>
 
             <span className="mb-1 text-sm font-semibold text-slate-400">
               L
@@ -265,7 +265,7 @@ export default function Dashboard() {
         </article>
 
         {/* ENERGÍA */}
-        <article className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_35px_rgba(15,23,42,0.07)]">
+        <article className="metric-energy group rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_35px_rgba(15,23,42,0.07)]">
 
           <div className="flex items-start justify-between">
 
@@ -287,9 +287,9 @@ export default function Dashboard() {
 
           <div className="mt-6 flex items-end gap-2">
 
-            <span className="text-3xl font-bold tracking-tight text-slate-900">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               {value(energy)}
-            </span>
+            </h2>
 
             <span className="mb-1 text-sm font-semibold text-slate-400">
               kWh
@@ -304,7 +304,7 @@ export default function Dashboard() {
         </article>
 
         {/* ALERTAS */}
-        <article className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_35px_rgba(15,23,42,0.07)]">
+        <article className="metric-alerts group rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_35px_rgba(15,23,42,0.07)]">
 
           <div className="flex items-start justify-between">
 
@@ -326,9 +326,9 @@ export default function Dashboard() {
 
           <div className="mt-6 flex items-end gap-2">
 
-            <span className="text-3xl font-bold tracking-tight text-slate-900">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               {loading ? '…' : alerts.length}
-            </span>
+            </h2>
 
             <span className="mb-1 text-sm font-semibold text-slate-400">
               activas

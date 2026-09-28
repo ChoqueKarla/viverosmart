@@ -13,6 +13,7 @@ const empty = {
   name: '',
   species: '',
   sectorId: '',
+  userId: '',
   stage: 'Semilla',
   growthPercent: 0,
 };
@@ -20,6 +21,7 @@ const empty = {
 export default function Cultivos() {
   const [crops, setCrops] = useState([]);
   const [sectors, setSectors] = useState([]);
+  const [users, setUsers] = useState([]);
   const [form, setForm] = useState(empty);
   const [editing, setEditing] = useState(null);
 
@@ -29,17 +31,21 @@ export default function Cultivos() {
 
   const load = async () => {
     try {
-      const [c, s] = await Promise.all([
+      const [c, s, u] = await Promise.all([
         axios.get(`${API_URL}/smart/cultivos`, {
           headers: headers(),
         }),
         axios.get(`${API_URL}/smart/sectores`, {
           headers: headers(),
         }),
+        axios.get(`${API_URL}/usuarios`, {
+          headers: headers(),
+        }).catch(() => ({ data: [] })),
       ]);
 
       setCrops(c.data);
       setSectors(s.data);
+      setUsers(u.data);
     } catch (error) {
       console.error('Error cargando datos:', error);
     }
@@ -71,6 +77,7 @@ export default function Cultivos() {
       const body = {
         ...form,
         sectorId: Number(form.sectorId),
+        userId: form.userId ? Number(form.userId) : null,
         growthPercent: Number(form.growthPercent),
       };
 
@@ -115,6 +122,7 @@ export default function Cultivos() {
       name: c.name,
       species: c.species || '',
       sectorId: String(c.sectorId),
+      userId: c.userId ? String(c.userId) : '',
       stage: c.stage,
       growthPercent: c.growthPercent,
     });
@@ -346,6 +354,28 @@ export default function Cultivos() {
 
             </select>
 
+          </div>
+
+          {/* =================================================
+              CLIENTE
+          ================================================= */}
+
+          <div>
+            <label className="mb-2 block text-xs font-semibold text-slate-600">
+              Cliente (Opcional)
+            </label>
+            <select
+              value={form.userId}
+              onChange={(e) => updateForm('userId', e.target.value)}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition hover:border-slate-300 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
+            >
+              <option value="">Ninguno</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* =================================================
@@ -603,6 +633,10 @@ export default function Cultivos() {
                 </th>
 
                 <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Cliente
+                </th>
+
+                <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Etapa
                 </th>
 
@@ -649,6 +683,16 @@ export default function Cultivos() {
 
                     <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
                       {c.sector?.name || '—'}
+                    </span>
+
+                  </td>
+
+                  {/* CLIENTE */}
+
+                  <td className="px-5 py-4">
+
+                    <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                      {c.user?.name || '—'}
                     </span>
 
                   </td>

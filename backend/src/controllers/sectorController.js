@@ -16,12 +16,17 @@ async function getAllSectors(req, res) {
     let whereClause = {};
     if (user.role.name !== 'Administrador') {
       const userSectorIds = [...new Set(user.crops.map(c => c.sectorId))];
-      whereClause = { id: { in: userSectorIds } };
+      whereClause = {
+        OR: [
+          { id: { in: userSectorIds } },
+          { userId: user.id }
+        ]
+      };
     }
 
     const sectors = await prisma.sector.findMany({ 
       where: whereClause,
-      include: { crops: true, sensors: true } 
+      include: { crops: true, sensors: true, user: { select: { id: true, name: true, email: true } } } 
     });
     res.json(sectors);
   } catch (error) {
@@ -31,8 +36,8 @@ async function getAllSectors(req, res) {
 
 async function createSector(req, res) {
   try {
-    const { name, description } = req.body;
-    const sector = await prisma.sector.create({ data: { name, description } });
+    const { name, description, userId } = req.body;
+    const sector = await prisma.sector.create({ data: { name, description, userId: userId ? parseInt(userId) : null } });
     await audit(req.user.id, 'CREATE_SECTOR', { id: sector.id, name: sector.name });
     res.json(sector);
   } catch (error) {
@@ -43,10 +48,10 @@ async function createSector(req, res) {
 async function updateSector(req, res) {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, userId } = req.body;
     const sector = await prisma.sector.update({
       where: { id: parseInt(id) },
-      data: { name, description }
+      data: { name, description, userId: userId ? parseInt(userId) : null }
     });
     await audit(req.user.id, 'UPDATE_SECTOR', { id: sector.id });
     res.json(sector);

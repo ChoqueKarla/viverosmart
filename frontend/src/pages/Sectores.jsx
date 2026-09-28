@@ -13,10 +13,12 @@ const API_URL =
 
 export default function Sectores() {
   const [sectores, setSectores] = useState([]);
+  const [users, setUsers] = useState([]);
 
   const [newSector, setNewSector] = useState({
     name: '',
     description: '',
+    userId: '',
   });
 
   const [editingSector, setEditingSector] = useState(null);
@@ -56,12 +58,19 @@ export default function Sectores() {
 
   const fetchSectores = async () => {
     try {
-      const res = await axios.get(
-        `${API_URL}/smart/sectores`,
-        getHeaders()
-      );
+      const [res, u] = await Promise.all([
+        axios.get(
+          `${API_URL}/smart/sectores`,
+          getHeaders()
+        ),
+        axios.get(
+          `${API_URL}/usuarios`,
+          getHeaders()
+        ).catch(() => ({ data: [] }))
+      ]);
 
       setSectores(res.data);
+      setUsers(u.data);
     } catch (error) {
       console.error(
         'Error al cargar sectores:',
@@ -126,6 +135,7 @@ export default function Sectores() {
       setNewSector({
         name: '',
         description: '',
+        userId: '',
       });
 
       await fetchSectores();
@@ -158,6 +168,7 @@ export default function Sectores() {
     setNewSector({
       name: sector.name,
       description: sector.description || '',
+      userId: sector.userId ? String(sector.userId) : '',
     });
 
     setMessage('');
@@ -224,6 +235,7 @@ export default function Sectores() {
     setNewSector({
       name: '',
       description: '',
+      userId: '',
     });
 
     setMessage('');
@@ -383,6 +395,33 @@ export default function Sectores() {
             </div>
 
             {/* =================================================
+                CLIENTE
+            ================================================= */}
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold text-slate-600">
+                Cliente (Opcional)
+              </label>
+              <select
+                value={newSector.userId}
+                onChange={(e) =>
+                  setNewSector({
+                    ...newSector,
+                    userId: e.target.value,
+                  })
+                }
+                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition hover:border-slate-300 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
+              >
+                <option value="">Ninguno</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* =================================================
                 BOTÓN
             ================================================= */}
 
@@ -517,6 +556,10 @@ export default function Sectores() {
                 </th>
 
                 <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Cliente
+                </th>
+
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Sensores IoT
                 </th>
 
@@ -560,6 +603,14 @@ export default function Sectores() {
                   <td className="px-5 py-4 text-sm text-slate-600">
                     {sector.description ||
                       'Sin descripción'}
+                  </td>
+
+                  {/* CLIENTE */}
+
+                  <td className="px-5 py-4">
+                    <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                      {sector.user ? sector.user.name : '—'}
+                    </span>
                   </td>
 
                   {/* SENSORES */}

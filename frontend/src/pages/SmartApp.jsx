@@ -513,7 +513,7 @@ export default function SmartApp() {
               setShowAccount(false);
               setShowNotifications(false);
             }}
-            className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-left transition hover:border-emerald-500/30 hover:bg-white/10"
+            className="workspace-label flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-left transition hover:border-emerald-500/30 hover:bg-white/10"
           >
 
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-500 font-black text-white">
@@ -538,7 +538,7 @@ export default function SmartApp() {
           </button>
 
           {workspaceOpen && (
-            <div className="absolute left-4 right-4 top-full z-50 mt-2 overflow-hidden rounded-xl border border-emerald-700/70 bg-[#214438] p-1.5 shadow-xl">
+            <div className="workspace-popover absolute left-4 right-4 top-full z-50 mt-2 overflow-hidden rounded-xl border border-emerald-700/70 bg-[#214438] p-1.5 shadow-xl">
 
               <button
                 onClick={() => {
@@ -778,7 +778,7 @@ export default function SmartApp() {
                 setShowNotifications(false);
                 setWorkspaceOpen(false);
               }}
-              className="grid h-11 w-11 place-items-center rounded-xl border border-emerald-700 bg-emerald-600 text-xs font-black text-white shadow-sm transition hover:bg-emerald-700"
+              className="topbar-avatar grid h-11 w-11 place-items-center rounded-xl border border-emerald-700 bg-emerald-600 text-xs font-black text-white shadow-sm transition hover:bg-emerald-700"
             >
               {(currentUser.name || role)
                 .split(/\s+/)
@@ -789,7 +789,7 @@ export default function SmartApp() {
             </button>
 
             {showAccount && (
-              <div className="absolute right-0 top-14 z-50 w-72 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
+              <div className="account-popover absolute right-0 top-14 z-50 w-72 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
 
                 <div className="bg-[#1a2f26] p-5">
                   <div className="flex items-center gap-3">

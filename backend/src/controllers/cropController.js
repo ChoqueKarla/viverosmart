@@ -44,10 +44,12 @@ async function getMyCrops(req, res) {
         where: { userId: req.user.id },
         include: { sector: true }
       }),
-      // Plant es la colección que usa el simulador. Todavía no tiene userId
-      // ni sectorId en el esquema, por lo que se expone como planta compartida
-      // del vivero y se adapta al contrato visual de Mis plantas.
-      prisma.plant.findMany({ orderBy: { createdAt: 'desc' } })
+      // Plant es la colección que usa el simulador.
+      prisma.plant.findMany({ 
+        where: { userId: req.user.id },
+        include: { sector: true },
+        orderBy: { createdAt: 'desc' } 
+      })
     ]);
 
     const mappedSimulatorPlants = simulatorPlants.map(plant => ({
@@ -56,13 +58,12 @@ async function getMyCrops(req, res) {
       species: plant.species,
       stage: 'Registrada en simulador',
       growthPercent: 0,
-      sector: null,
+      sector: plant.sector,
       source: 'SIMULATOR'
     }));
 
-    // El simulador no posee sector ni progreso operativo; no debe mezclarse
-    // con los cultivos reales mostrados en "Mis plantas".
-    res.json(crops);
+    // Combinamos cultivos y plantas del simulador para la vista Mis Plantas
+    res.json([...crops, ...mappedSimulatorPlants]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
