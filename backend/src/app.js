@@ -32,6 +32,7 @@ const allowedOrigins = new Set([
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'http://localhost:5173',
   'http://viverosmart-frontend-alb-1642573275.us-east-1.elb.amazonaws.com',
+  'https://main.d2gry3pkizcub6.amplifyapp.com',
 ]);
 
 const corsOptions = {
