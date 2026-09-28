@@ -64,13 +64,22 @@ export default function Sectores() {
           getHeaders()
         ),
         axios.get(
-          `${API_URL}/usuarios`,
+            `${API_URL}/smart/usuarios`,
           getHeaders()
         ).catch(() => ({ data: [] }))
       ]);
 
       setSectores(res.data);
       setUsers(u.data);
+      setUsers(
+        u.data.filter(
+          (user) =>
+            user.role === 'Cliente' ||
+            user.role?.name === 'Cliente' ||
+            user.rol === 'Cliente' ||
+            user.rol?.name === 'Cliente'
+        )
+      );
     } catch (error) {
       console.error(
         'Error al cargar sectores:',
