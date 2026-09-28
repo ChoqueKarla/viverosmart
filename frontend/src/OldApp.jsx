@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -57,7 +57,9 @@ function Simulator({ demo, requestedId, createRequested, onRetry, onSelectPlant 
   const [newName, setNewName] = useState('');
   const [newSpecies, setNewSpecies] = useState('');
   const [sectors, setSectors] = useState([]);
+  const [users, setUsers] = useState([]);
   const [newSectorId, setNewSectorId] = useState('');
+  const [newUserId, setNewUserId] = useState('');
   const timer = useRef(null);
   const authenticated = Boolean(localStorage.getItem('token'));
   const accountPath = authenticated ? '/dashboard' : '/';
@@ -78,11 +80,13 @@ function Simulator({ demo, requestedId, createRequested, onRetry, onSelectPlant 
     const controller = new AbortController();
     async function loadPlants() {
       try {
-        const [{ data }, { data: sectorData }] = await Promise.all([
+        const [{ data }, { data: sectorData }, { data: userData }] = await Promise.all([
           axios.get(`${API_URL}/plantas`, { signal: controller.signal, headers: authHeaders() }),
-          axios.get(`${API_URL}/smart/sectores`, { signal: controller.signal, headers: authHeaders() })
+          axios.get(`${API_URL}/smart/sectores`, { signal: controller.signal, headers: authHeaders() }),
+          axios.get(`${API_URL}/usuarios`, { signal: controller.signal, headers: authHeaders() }).catch(() => ({ data: [] }))
         ]);
         setSectors(sectorData);
+        setUsers(userData);
         setNewSectorId(current => current || String(sectorData[0]?.id || ''));
         if (!Array.isArray(data)) throw new Error('Respuesta de plantas no válida');
         setPlants(data);
@@ -144,7 +148,8 @@ function Simulator({ demo, requestedId, createRequested, onRetry, onSelectPlant 
         species: newSpecies.trim(),
         lat: mapPosition.lat,
         lng: mapPosition.lng,
-        sectorId: Number(newSectorId)
+        sectorId: Number(newSectorId),
+        userId: newUserId ? Number(newUserId) : null
       }, { headers: authHeaders() });
       localStorage.setItem(SELECTED_PLANT_KEY, String(data.id));
       onSelectPlant(data.id);
@@ -274,6 +279,14 @@ function Simulator({ demo, requestedId, createRequested, onRetry, onSelectPlant 
                   {sectors.map(sector => <option key={sector.id} value={sector.id}>{sector.name}</option>)}
                 </select>
               </label>
+              {users.length > 0 && (
+                <label htmlFor="plant-user">Cliente (Opcional)
+                  <select id="plant-user" value={newUserId} onChange={event => setNewUserId(event.target.value)}>
+                    <option value="">Ninguno</option>
+                    {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
+                  </select>
+                </label>
+              )}
               {!sectors.length && <p className="feedback error">No tienes zonas disponibles. Un administrador debe crear una zona y asignarte un cultivo antes de registrar plantas.</p>}
               <p className="small-muted">Ubicación: {mapPosition.lat.toFixed(4)}, {mapPosition.lng.toFixed(4)}. Puedes cambiarla en el mapa.</p>
               <button className="button button-dark" disabled={pending || !newName.trim() || !newSpecies.trim() || !newSectorId}>

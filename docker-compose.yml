@@ -1,19 +1,40 @@
 services:
-  api:
-    build: ./backend
-    env_file:
-      - ./backend/.env
-      - ./.env.docker
+  postgres:
+    image: postgres:16-alpine
+    container_name: viverosmart-postgres
+    restart: unless-stopped
     environment:
-      FRONTEND_URL: http://localhost:8080
-      PORT: 5000
+      POSTGRES_DB: viverosmart
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: micontaseña
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: viverosmart-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgresql://postgres:micontaseña@postgres:5432/viverosmart?schema=public"
+      JWT_SECRET: "screto no èsto"
+      FRONTEND_URL: "http://localhost"
     ports:
       - "5000:5000"
 
-  web:
+  frontend:
     build:
       context: ./frontend
-      args:
-        VITE_API_URL: http://localhost:5000/api
+    container_name: viverosmart-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
     ports:
-      - "8080:80"
+      - "80:80"
+
+volumes:
+  postgres_data:

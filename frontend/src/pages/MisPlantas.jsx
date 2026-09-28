@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react';
+﻿
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Sun,
@@ -41,26 +42,31 @@ const PlantAvatar = ({ type }) => {
           strokeWidth="4"
           fill="none"
         />
+
         <path
           d="M52 80 Q70 70 80 50"
           stroke="#388E3C"
           strokeWidth="3"
           fill="none"
         />
+
         <path
           d="M49 60 Q30 55 20 40"
           stroke="#388E3C"
           strokeWidth="3"
           fill="none"
         />
+
         <path
           d="M80 50 Q85 45 90 52 Q82 58 80 50"
           fill="#4CAF50"
         />
+
         <path
           d="M20 40 Q15 35 10 42 Q18 48 20 40"
           fill="#4CAF50"
         />
+
         <circle
           cx="70"
           cy="90"
@@ -69,6 +75,7 @@ const PlantAvatar = ({ type }) => {
           stroke="#B71C1C"
           strokeWidth="1"
         />
+
         <circle
           cx="30"
           cy="70"
@@ -77,6 +84,7 @@ const PlantAvatar = ({ type }) => {
           stroke="#B71C1C"
           strokeWidth="1"
         />
+
         <circle
           cx="60"
           cy="30"
@@ -220,7 +228,9 @@ export default function MisPlantas() {
     return (
       <div className="min-h-full bg-[#f6f7f5] p-6 md:p-8">
         <div className="mx-auto max-w-7xl animate-pulse">
+
           <div className="mb-8 h-10 w-64 rounded-lg bg-slate-200" />
+
           <div className="mb-8 h-4 w-96 max-w-full rounded bg-slate-200" />
 
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -231,6 +241,7 @@ export default function MisPlantas() {
               />
             ))}
           </div>
+
         </div>
       </div>
     );
@@ -245,6 +256,7 @@ export default function MisPlantas() {
         {/* =====================================================
             CABECERA
         ====================================================== */}
+
         <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 
           <div className="flex items-start gap-4">
@@ -254,7 +266,9 @@ export default function MisPlantas() {
             </div>
 
             <div>
+
               <div className="mb-1 flex items-center gap-2">
+
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
                   Cultivos
                 </span>
@@ -264,6 +278,7 @@ export default function MisPlantas() {
                 <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                   Seguimiento
                 </span>
+
               </div>
 
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -274,11 +289,13 @@ export default function MisPlantas() {
                 Supervisa el crecimiento y estado de tus cultivos
                 desde un solo lugar.
               </p>
+
             </div>
 
           </div>
 
           {/* RESUMEN */}
+
           <div className="flex w-fit items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
 
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
@@ -286,6 +303,7 @@ export default function MisPlantas() {
             </div>
 
             <div>
+
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Cultivos registrados
               </p>
@@ -293,24 +311,33 @@ export default function MisPlantas() {
               <p className="text-lg font-bold leading-5 text-slate-800">
                 {total}
               </p>
+
             </div>
 
           </div>
+
         </div>
 
         {/* =====================================================
             CONTENIDO
         ====================================================== */}
+
         {plantas.length > 0 ? (
+
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
 
             {plantas.map((planta) => {
+
               const growth = Math.min(
                 100,
-                Math.max(0, Number(planta.growthPercent) || 0)
+                Math.max(
+                  0,
+                  Number(planta.growthPercent) || 0
+                )
               );
 
               return (
+
                 <div
                   key={planta.id}
                   className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl hover:shadow-slate-200/60"
@@ -319,9 +346,9 @@ export default function MisPlantas() {
                   {/* =================================================
                       HEADER DE LA PLANTA
                   ================================================== */}
+
                   <div className="relative h-44 overflow-hidden bg-gradient-to-br from-[#edf8f2] via-white to-[#f5faf7] px-6 py-5">
 
-                    {/* Decoración */}
                     <div className="absolute -right-10 -top-16 h-40 w-40 rounded-full bg-emerald-100/60 blur-2xl" />
 
                     <div className="absolute -bottom-20 left-20 h-36 w-36 rounded-full bg-lime-100/40 blur-3xl" />
@@ -338,32 +365,55 @@ export default function MisPlantas() {
                           {planta.name}
                         </h2>
 
-                        <p className="mt-1 text-xs font-medium uppercase tracking-wider text-emerald-700/70">
-                          {planta.species || 'Especie general'}
+                        <p className="mt-1 flex flex-col text-xs font-medium uppercase tracking-wider text-emerald-700/70">
+
+                          <span>
+                            {planta.species || 'Especie general'}
+                          </span>
+
+                          {planta.sector?.name && (
+                            <span className="mt-1 flex items-center gap-1 font-bold text-[#092f25]">
+
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+
+                              Zona: {planta.sector.name}
+
+                            </span>
+                          )}
+
                         </p>
 
                       </div>
 
                       <div className="flex items-end justify-end">
+
                         <PlantAvatar
-                          type={planta.species || planta.name}
+                          type={
+                            planta.species ||
+                            planta.name
+                          }
                         />
+
                       </div>
 
                     </div>
+
                   </div>
 
                   {/* =================================================
                       INFORMACIÓN
                   ================================================== */}
+
                   <div className="p-5">
 
                     {/* ETAPA */}
+
                     <div className="mb-6">
 
                       <div className="mb-2 flex items-center justify-between">
 
                         <div>
+
                           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
                             Etapa actual
                           </p>
@@ -371,17 +421,21 @@ export default function MisPlantas() {
                           <p className="mt-0.5 text-sm font-bold text-slate-800">
                             {planta.stage}
                           </p>
+
                         </div>
 
                         <div className="rounded-lg bg-emerald-50 px-2.5 py-1.5">
+
                           <span className="text-sm font-bold text-emerald-700">
                             {growth}%
                           </span>
+
                         </div>
 
                       </div>
 
                       {/* BARRA */}
+
                       <div className="h-2 overflow-hidden rounded-full bg-slate-100">
 
                         <div
@@ -394,6 +448,7 @@ export default function MisPlantas() {
                       </div>
 
                       <div className="mt-2 flex justify-between">
+
                         <span className="text-[10px] font-medium text-slate-400">
                           Semilla
                         </span>
@@ -405,11 +460,13 @@ export default function MisPlantas() {
                         <span className="text-[10px] font-medium text-slate-400">
                           Cosecha
                         </span>
+
                       </div>
 
                     </div>
 
                     {/* INDICADORES */}
+
                     <div className="grid grid-cols-2 gap-3">
 
                       <div className="rounded-xl border border-amber-100 bg-amber-50/60 p-3.5">
@@ -447,11 +504,17 @@ export default function MisPlantas() {
                     </div>
 
                     {/* PIE */}
+
                     <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
 
                       <div className="flex items-center gap-2 text-xs text-slate-400">
+
                         <Activity size={14} />
-                        <span>Seguimiento activo</span>
+
+                        <span>
+                          Seguimiento activo
+                        </span>
+
                       </div>
 
                       <button
@@ -464,52 +527,66 @@ export default function MisPlantas() {
                           size={15}
                           className="transition-transform group-hover/button:translate-x-0.5"
                         />
+
                       </button>
 
                     </div>
 
                   </div>
+
                 </div>
+
               );
             })}
+
           </div>
+
         ) : (
 
           /* =====================================================
              ESTADO VACÍO
           ====================================================== */
-          <div className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
 
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-              <Sprout size={30} />
+          <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
+
+            <div className="flex w-full max-w-md flex-col items-center">
+
+              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+                <Sprout size={30} />
+              </div>
+
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+                Sin cultivos
+              </span>
+
+              <h2 className="mt-2 text-center text-xl font-bold text-slate-800">
+                Todavía no tienes plantas asignadas
+              </h2>
+
+              <p className="mx-auto mt-2 max-w-md text-center text-sm leading-6 text-slate-500">
+                Registra una planta para comenzar a realizar el
+                seguimiento de su crecimiento y estado.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => navigate('/simulador?nueva=1')}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#123c30] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0d3026] hover:shadow-md active:scale-[0.98]"
+              >
+                Registrar una planta
+
+                <ArrowRight size={17} />
+
+              </button>
+
             </div>
 
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
-              Sin cultivos
-            </span>
-
-            <h2 className="mt-2 text-xl font-bold text-slate-800">
-              Todavía no tienes plantas asignadas
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-              Registra una planta para comenzar a realizar el
-              seguimiento de su crecimiento y estado.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => navigate('/simulador?nueva=1')}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#123c30] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0d3026] hover:shadow-md active:scale-[0.98]"
-            >
-              Registrar una planta
-              <ArrowRight size={17} />
-            </button>
-
           </div>
+
         )}
 
       </div>
     </div>
   );
 }
+

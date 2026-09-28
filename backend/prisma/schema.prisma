@@ -7,32 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// -----------------------------------------------------------------
-// ENTIDADES ORIGINALES (Vivero Inteligente)
-// Mantenidas por compatibilidad visual
-// -----------------------------------------------------------------
 model Plant {
-  id              Int               @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   name            String
   species         String
-  createdAt       DateTime          @default(now())
+  createdAt       DateTime         @default(now())
   lat             Float
   lng             Float
+  sectorId        Int?
+  userId          Int?
+  dailyReports    DailyReport[]
+  sector          Sector?          @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  user            User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendations Recommendation[]
   soilStates      SoilState[]
   weatherStates   WeatherState[]
-  recommendations Recommendation[]
-  dailyReports    DailyReport[]
-  sectorId        Int?
-  sector          Sector?          @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-  userId          Int?
-  user            User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SoilState {
   id                 Int      @id @default(autoincrement())
   plantId            Int
   moisturePercentage Float
-  state              String   
+  state              String
   timestamp          DateTime @default(now())
   plant              Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
 }
@@ -40,7 +36,7 @@ model SoilState {
 model WeatherState {
   id        Int      @id @default(autoincrement())
   plantId   Int
-  state     String   
+  state     String
   timestamp DateTime @default(now())
   plant     Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
 }
@@ -49,7 +45,7 @@ model Recommendation {
   id           Int      @id @default(autoincrement())
   plantId      Int
   message      String
-  urgencyLevel String   
+  urgencyLevel String
   timestamp    DateTime @default(now())
   plant        Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
 }
@@ -60,20 +56,16 @@ model DailyReport {
   date         DateTime @default(now())
   waterSummary String
   lightSummary String
-  jsonContent  String   
+  jsonContent  String
   createdAt    DateTime @default(now())
   plant        Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
 }
 
-// -----------------------------------------------------------------
-// NUEVAS ENTIDADES (ViveroSmart - Consumo Agua y Energía)
-// -----------------------------------------------------------------
-
 model Role {
   id          Int              @id @default(autoincrement())
-  name        String           @unique // 'Administrador', 'Operador', 'Tecnico', 'Cliente'
-  users       User[]
+  name        String           @unique
   permissions RolePermission[]
+  users       User[]
 }
 
 model Permission {
@@ -86,101 +78,104 @@ model Permission {
 model RolePermission {
   roleId       Int
   permissionId Int
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  name      String
-  email     String     @unique
-  password  String
-  roleId    Int
-  role      Role       @relation(fields: [roleId], references: [id])
-  auditLogs AuditLog[]
-  crops     Crop[]
-  resetTokens PasswordResetToken[]
+  id              Int                  @id @default(autoincrement())
+  name            String
+  email           String               @unique
+  password        String
+  roleId          Int
+  auditLogs       AuditLog[]
+  crops           Crop[]
+  resetTokens     PasswordResetToken[]
   simulatorPlants Plant[]
+  sectors         Sector[]             @relation("SectorClient")
+  role            Role                 @relation(fields: [roleId], references: [id])
 }
 
 model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  tokenHash String   @unique
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
   userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Sector {
-  id          Int           @id @default(autoincrement())
-  name        String        @unique
-  description String?
-  crops       Crop[]
-  sensors     Sensor[]
+  id           Int                  @id @default(autoincrement())
+  name         String               @unique
+  description  String?
+  userId       Int?
+  alerts       Alert[]
   consumptions Consumption[]
-  alerts      Alert[]
-  schedules   Schedule[]
-  thresholds  Threshold[]
-  anomalies   ConsumptionAnomaly[]
-  plants      Plant[]
+  anomalies    ConsumptionAnomaly[]
+  crops        Crop[]
+  plants       Plant[]
+  schedules    Schedule[]
+  user         User?                @relation("SectorClient", fields: [userId], references: [id])
+  sensors      Sensor[]
+  thresholds   Threshold[]
 }
 
 model Crop {
   id            Int     @id @default(autoincrement())
   name          String
   species       String?
-  stage         String  @default("Semilla") // Semilla, Brote, Crecimiento, Floración, Cosecha
+  stage         String  @default("Semilla")
   growthPercent Int     @default(0)
   sectorId      Int
-  sector        Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   userId        Int?
+  sector        Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   user          User?   @relation(fields: [userId], references: [id])
 }
 
 model Sensor {
-  id       Int     @id @default(autoincrement())
-  code     String  @unique
-  type     String  // 'AGUA' o 'ENERGIA'
-  status   String  @default("ACTIVO") // 'ACTIVO', 'INACTIVO', 'INCIDENCIA'
-  sectorId Int
-  sector   Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  id           Int           @id @default(autoincrement())
+  code         String        @unique
+  type         String
+  status       String        @default("ACTIVO")
+  sectorId     Int
   consumptions Consumption[]
+  sector       Sector        @relation(fields: [sectorId], references: [id], onDelete: Cascade)
 }
 
 model Consumption {
-  id           Int      @id @default(autoincrement())
-  resourceType String   // 'AGUA' o 'ENERGIA'
-  quantity     Float    // litros o kWh
-  isManual     Boolean  @default(false)
-  timestamp    DateTime @default(now())
+  id           Int                  @id @default(autoincrement())
+  resourceType String
+  quantity     Float
+  isManual     Boolean              @default(false)
+  timestamp    DateTime             @default(now())
   sectorId     Int
-  sector       Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   sensorId     Int?
-  sensor       Sensor?  @relation(fields: [sensorId], references: [id])
+  sector       Sector               @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  sensor       Sensor?              @relation(fields: [sensorId], references: [id])
   anomalies    ConsumptionAnomaly[]
 }
 
 model ConsumptionAnomaly {
-  id            Int      @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   resourceType  String
   quantity      Float
   level         String
   reason        String
-  timestamp     DateTime @default(now())
+  timestamp     DateTime     @default(now())
   resolvedAt    DateTime?
   consumptionId Int?
-  consumption   Consumption? @relation(fields: [consumptionId], references: [id], onDelete: SetNull)
   sectorId      Int
-  sector        Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  consumption   Consumption? @relation(fields: [consumptionId], references: [id])
+  sector        Sector       @relation(fields: [sectorId], references: [id], onDelete: Cascade)
 }
 
 model Threshold {
-  id           Int    @id @default(autoincrement())
-  resourceType String // 'AGUA' o 'ENERGIA'
+  id           Int     @id @default(autoincrement())
+  resourceType String
   maxLimit     Float
   warningLimit Float?
   sectorId     Int?
@@ -191,8 +186,8 @@ model Threshold {
 
 model Alert {
   id           Int      @id @default(autoincrement())
-  resourceType String   // 'AGUA' o 'ENERGIA'
-  level        String   // 'ADVERTENCIA', 'CRITICA'
+  resourceType String
+  level        String
   reason       String
   timestamp    DateTime @default(now())
   sectorId     Int
@@ -200,14 +195,14 @@ model Alert {
 }
 
 model Schedule {
-  id           Int      @id @default(autoincrement())
-  type         String   // 'RIEGO' o 'ILUMINACION'
-  time         String   // Ej: '14:30'
+  id           Int       @id @default(autoincrement())
+  type         String
+  time         String
   durationMins Int
   date         DateTime?
-  enabled      Boolean  @default(true)
+  enabled      Boolean   @default(true)
   sectorId     Int
-  sector       Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  sector       Sector    @relation(fields: [sectorId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
