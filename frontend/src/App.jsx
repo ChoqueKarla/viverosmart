@@ -11,6 +11,7 @@ export default function App() {
       <Suspense fallback={<div className="loading-panel" role="status">Preparando tu espacio…</div>}>
       <Routes>
         <Route path="/" element={<Login />} />
+	<Route path="/index.html" element={<Navigate to="/" replace />} />
         <Route path="/restablecer-contrasena" element={<RecuperarContrasena />} />
         <Route path="/dashboard/*" element={<SmartApp />} />
         <Route path="/simulador" element={<ProtectedSimulator />} />

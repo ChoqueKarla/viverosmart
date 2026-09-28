@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -16,39 +17,66 @@ const apiRoutes = require('./routes/apiRoutes');
 require('./jobs/cron');
 require('./jobs/archive');
 const { ensurePermissions } = require('./controllers/roleController');
-ensurePermissions().catch(error => console.error('No se pudieron inicializar los permisos:', error.message));
+
+ensurePermissions().catch(error =>
+  console.error(
+    'No se pudieron inicializar los permisos:',
+    error.message
+  )
+);
 
 const app = express();
 
-// 2. CORS Restringido (Vulnerabilidad #2 parchada)
+// CORS
 const allowedOrigins = new Set([
   process.env.FRONTEND_URL || 'http://localhost:5173',
-  // Vite puede abrir el mismo servidor de desarrollo con cualquiera de
-  // estas direcciones; ambas deben poder alcanzar la API local.
   'http://localhost:5173',
-  'http://127.0.0.1:5173'
+  'http://viverosmart-frontend-alb-1642573275.us-east-1.elb.amazonaws.com',
 ]);
+
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+    // Permitir peticiones sin Origin (curl, Postman, health checks, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Permitir orígenes conocidos
+    if (allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
+
+    // Permitir el frontend HTTP servido desde ECS,
+    // aunque su IP pública cambie.
+    if (/^http:\/\/\d{1,3}(\.\d{1,3}){3}$/.test(origin)) {
+      return callback(null, true);
+    }
+
     return callback(new Error('Origen no permitido por CORS'));
   },
   optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// 1. Rate Limiting (Vulnerabilidad #1 parchada)
+// Rate Limiting
 const rateLimit = require('express-rate-limit');
+
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Limita a 100 peticiones por IP cada 15 min
-  message: { error: 'Demasiadas peticiones desde esta IP. Inténtalo de nuevo en 15 minutos.' }
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    error: 'Demasiadas peticiones desde esta IP. Inténtalo de nuevo en 15 minutos.'
+  }
 });
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10, // Más estricto para rutas de login/registro (10 intentos)
-  message: { error: 'Demasiados intentos fallidos. Bloqueado temporalmente por seguridad.' }
+  max: 10,
+  message: {
+    error: 'Demasiados intentos fallidos. Bloqueado temporalmente por seguridad.'
+  }
 });
 
 app.use('/api/', limiter);
@@ -70,6 +98,9 @@ app.get('/health', async (_req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-  console.log(`Backend de Vivero Inteligente corriendo en puerto ${PORT}`);
+  console.log(
+    `Backend de Vivero Inteligente corriendo en puerto ${PORT}`
+  );
 });
